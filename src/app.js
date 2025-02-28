@@ -2,22 +2,26 @@ const express = require("express");
 
 const app = express();
 
-const {adminAuth, userAuth} = require("./middlewares/auth");
-
-
-app.use("/admine", adminAuth);
-
-app.get("/user", userAuth, (req, res)=>{
-    res.send("User page");
-} )
-
-
-app.get("/admine/getAlldata", (req,res)=>{
-    res.send("Home page");
+app.use((err,req,res,next)=>{
+    if(err){
+    console.log(err);
+    res.status(500).send("Something went worng");
+    }else{
+        next();
+    }
 })
 
-app.get("/admine/deleteUser", (req,res) =>{
-    res.send("User deleted");
+app.get("/getuserData", (req,res)=>{
+    //throw new Error("ksoehfjs");
+    res.send("This is a get request");
+})
+
+
+app.use((err,req,res,next)=>{
+    if(err){
+    console.log(err);
+    res.status(500).send("Something went worng");
+    }
 })
 
 
