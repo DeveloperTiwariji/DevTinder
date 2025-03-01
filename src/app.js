@@ -1,32 +1,38 @@
 const express = require("express");
-
+const connectDB =require("./config/database");
 const app = express();
+const User = require("./models/user");
 
-app.use((err,req,res,next)=>{
-    if(err){
-    console.log(err);
-    res.status(500).send("Something went worng");
-    }else{
-        next();
-    }
-})
-
-app.get("/getuserData", (req,res)=>{
-    //throw new Error("ksoehfjs");
-    res.send("This is a get request");
-})
+// app.use(express.json());
 
 
-app.use((err,req,res,next)=>{
-    if(err){
-    console.log(err);
-    res.status(500).send("Something went worng");
-    }
-})
-
-
-
-app.listen(3000, ()=>{
-    console.log("Server is running on port 3000");
+app.post("/signup", async (req,res)=>{
+    // const { firstName, lastName, email, password, age } = req.body;
     
+    const user = new User({
+        firstName:"Satyam",
+        lastName:"Tiwari",
+        email:"tiwarisittu@gmail.com",
+        password:"satyam123",
+        age:20,
+    });
+    try {
+        await user.save();
+        res.send("User created successfully");
+    } catch (error) {
+        console.error("Error creating user:", error);
+        res.status(500).send("Error creating user");
+    }
 })
+
+
+connectDB().then(()=>{
+    console.log("Connected to the database");
+    app.listen(3000, ()=>{
+        console.log("Server is running on port 3000");
+        
+    });
+}).catch((err)=>{
+    console.error("Error connecting to the database");
+})
+
