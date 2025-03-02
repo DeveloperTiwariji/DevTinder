@@ -52,6 +52,30 @@ app.get("/feed", async (req,res)=>{
 })
 
 
+app.delete("/user", async (req,res)=>{
+    const userId = req.body.userId;
+    try{
+        const user = await User.findByIdAndDelete(userId);
+        res.send("User deleted successfully");
+    }catch(error){
+        res.status(500).send("Error deleting user");
+    }
+})
+
+
+ 
+app.patch("/user", async (req,res)=>{
+    const userId = req.body.userId;
+    const data = req.body;
+    try{
+        const user = await User.findByIdAndUpdate({_id:userId}, data);
+        console.log(user);
+        res.send("User updated successfully");
+    }catch(error){
+        res.status(500).send("Error updating user");
+    }
+})
+
 
 
 
