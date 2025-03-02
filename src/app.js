@@ -20,6 +20,41 @@ app.post("/signup", async (req,res)=>{
 })
 
 
+app.get("/user", async (req,res)=>{
+
+    const userEmail = req.body.email;
+
+    try{
+        const user = await User.findOne({email:userEmail});
+        if(!user){
+            res.status(404).send("User not found");
+        }else{
+            res.send(user);
+        }
+    }catch(error){
+        console.error("Error finding user:", error);
+        res.status(500).send("Error finding user");
+    }
+})
+
+
+app.get("/feed", async (req,res)=>{
+    try{
+        const users = await User.find({});
+        if(users.length === 0){
+            res.status(404).send("No users found");
+        }else{
+            res.send(users);
+        }
+    }catch(error){
+        res.status(500).send("Error finding users");
+    }
+})
+
+
+
+
+
 connectDB().then(()=>{
     console.log("Connected to the database");
     app.listen(3000, ()=>{
