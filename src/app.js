@@ -2,22 +2,91 @@ const express = require("express");
 const connectDB =require("./config/database");
 const app = express();
 const User = require("./models/user");
-
+const validateSignUpData = require("./utils/validation");
+const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jsonwebtoken = require("jsonwebtoken");
+const {userAuth} = require("./middlewares/auth");
 // app.use(express.json());
 
 app.use(express.json());
-
+app.use(cookieParser());
+ 
 
 app.post("/signup", async (req,res)=>{
-    const user = new User(req.body);
+
     try {
+        validateSignUpData(req);
+        const {firstName, lastName, email, password} = req.body;
+
+        const bcryptPassword = await bcrypt.hash(password, 10);
+        // console.log(bcryptPassword);
+        const user  = new User({
+            firstName,
+            lastName,
+            email,
+            password:bcryptPassword
+        });
         await user.save();
         res.send("User created successfully");
     } catch (error) {
         console.error("Error creating user:", error);
-        res.status(500).send("Error creating user");
+        res.status(500).send("Error: "+ error.message);
     }
 })
+
+ app.post("/login", async (req,res)=>{
+
+    const {email, password} = req.body;
+
+    try{
+
+        const user = await User.findOne({email:email});
+        if(!user){
+            throw new Error("User not found");
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if(isPasswordValid){
+
+        const token = jsonwebtoken.sign({_id:user._id},"Sattu01@A", {expiresIn:"1d"});
+
+        
+        res.cookie("token", token, {expires: new Date(Date.now() +8*3600000)});
+
+            res.send("Login successful");
+        }else{
+            throw new Error("Login failed");
+        }
+
+    }catch (error) {
+
+        res.status(500).send("Error: "+ error.message);
+    }
+ })
+
+ app.post("/profile", userAuth, async (req,res)=>{
+
+   try{ 
+    const user = req.user;
+    res.send(user);
+}catch (error) {
+       
+        res.status(500).send("Error: "+ error.message);
+    }
+})
+
+
+app.post("/sendConnectionRequest",userAuth, async (req, res)=>{
+    console.log("Sending a connection request");
+
+    const user = req.user;
+
+
+    res.send(user.firstName+ " send the connection request");
+})
+ 
 
 
 app.get("/user", async (req,res)=>{
