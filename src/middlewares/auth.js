@@ -7,6 +7,7 @@ const userAuth = async (req,res, next)=>{
     try{
         // const cookie = req.cookie;
         const {token} = req.cookies;
+        console.log(token);
         if(!token){
             throw Error("Token not found!!!!");
         }
