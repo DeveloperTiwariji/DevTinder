@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     firstName:{
         type:String,
         required:true,
+        index:true,
         minlength:4,
         maxlength:20,
     },
@@ -62,6 +63,7 @@ const userSchema = new mongoose.Schema({
     },
     about:{
         type:String,
+        default: "I am default user",
         maxlength:500,
     },
     skills:{
