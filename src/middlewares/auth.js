@@ -9,7 +9,7 @@ const userAuth = async (req,res, next)=>{
         const {token} = req.cookies;
         // console.log(token);
         if(!token){
-            throw Error("Token not found!!!!");
+            return res.status(401).send("Please login to access this resource");
         }
         const decodedObj = await jwt.verify(token, "Sattu01@A");
 

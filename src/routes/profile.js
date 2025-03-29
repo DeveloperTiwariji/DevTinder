@@ -5,10 +5,11 @@ const profileRouter = express.Router();
 const {validateResetPasswordData} = require("../utils/validation");
 const bcrypt = require("bcrypt");
 
-profileRouter.post("/profile/view", userAuth, async (req,res)=>{
+profileRouter.get("/profile/view", userAuth, async (req,res)=>{
 
     try{ 
      const user = req.user;
+    //  console.log(user);
      res.send(user);
  }catch (error) {
         

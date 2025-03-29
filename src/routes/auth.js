@@ -11,16 +11,19 @@ authRouter.post("/signup", async (req,res)=>{
         validateSignUpData(req);
         const {firstName, lastName, email, password} = req.body;
 
-        const bcryptPassword = await bcrypt.hash(password, 7);
-        // console.log(bcryptPassword);
+        const bcryptPassword = await bcrypt.hash(password, 10);
+
         const user  = new User({
             firstName,
             lastName,
             email,
             password:bcryptPassword
         });
-        await user.save();
-        res.send("User created successfully");
+        const sinUpUser = await user.save();
+        const token = await sinUpUser.getJWT();
+        res.cookie("token", token, {expires: new Date(Date.now() +8*3600000)});
+
+        res.json({message:"User created successfully", data:sinUpUser});
     } catch (error) {
         console.error("Error creating user:", error);
         res.status(500).send("Error: "+ error.message);
@@ -32,7 +35,6 @@ authRouter.post("/login", async (req,res)=>{
     const {email, password} = req.body;
 
     try{
-
         const user = await User.findOne({email:email});
         if(!user){
             throw new Error("User not found");
@@ -46,9 +48,9 @@ authRouter.post("/login", async (req,res)=>{
         
         res.cookie("token", token, {expires: new Date(Date.now() +8*3600000)});
 
-            res.send("Login successful");
+            res.send(user);
         }else{
-            throw new Error("Login failed");
+            throw new Error("Invalid Password");
         }
 
     }catch (error) {
